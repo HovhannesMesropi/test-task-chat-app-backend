@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.ts",
+    "start": "nodemon src/index.ts",
     "gen": "tsc --init"
   },
   "author": "Hovhannes Amirjanyan",
@@ -26,6 +26,7 @@
     "express-validator": "^7.1.0",
     "mysql2": "^3.10.3",
     "sequelize": "^6.37.3",
+    "sequelize-typescript": "^2.1.6",
     "ws": "^8.18.0"
   }
 }
