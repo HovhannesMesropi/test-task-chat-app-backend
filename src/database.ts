@@ -15,7 +15,7 @@ export const sequelize = new Sequelize({
 });
 
 
-export const initializeDatabase = async () => {
+export const initDB = async () => {
   try {
     await sequelize.sync({ force: true });
     console.log('Database & tables created!');
