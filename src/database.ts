@@ -17,7 +17,7 @@ export const sequelize = new Sequelize({
 
 export const initDB = async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     console.log('Database & tables created!');
   } catch (error) {
     console.error('Unable to create tables, shutting down...', error);

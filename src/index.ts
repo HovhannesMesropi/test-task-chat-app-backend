@@ -5,8 +5,12 @@ import cors from "cors";
 import { initDB } from "./database";
 import { body, validationResult } from "express-validator";
 import { config as envConfig } from "dotenv";
-import { allMessages, newMessage } from "./services/messages";
-import bodyParser from 'body-parser';
+import {
+  allMessages,
+  newMessage,
+  removeOldestMessage,
+} from "./services/messages";
+import bodyParser from "body-parser";
 
 envConfig();
 const env = process.env;
@@ -17,8 +21,7 @@ const env = process.env;
   const app = express();
   const server = http.createServer(app);
   const wss = new WebSocket.Server({ server });
-
-  app.use(bodyParser.json())
+  app.use(bodyParser.json());
   app.use(cors());
 
   wss.on("connection", (ws) => {
@@ -26,7 +29,8 @@ const env = process.env;
   });
 
   app.get("/messages", async (_req, res) => {
-    res.status(200).send(await allMessages());
+    const messages = await allMessages();
+    res.status(200).send(messages);
   });
 
   app.post(
@@ -36,9 +40,18 @@ const env = process.env;
     async (req, res) => {
       const result = validationResult(req);
       if (result.isEmpty()) {
-        /* remove oldest message after 9 */
-        await newMessage(req.body.name,req.body.message);
-        wss.emit("new-message");
+        /* save new message */
+        await newMessage(req.body.name, req.body.message);
+
+        /* remove oldest message */
+        await removeOldestMessage();
+
+        /* send all clients about update of messages */
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send("messages-updated");
+          }
+        });
 
         res.status(200).send({ result: true });
       } else {
@@ -47,7 +60,7 @@ const env = process.env;
     }
   );
 
-  app.listen(env.PORT, () =>
+  server.listen(env.PORT, () =>
     console.log(`chat-application listen ${env.PORT}`)
   );
 })();

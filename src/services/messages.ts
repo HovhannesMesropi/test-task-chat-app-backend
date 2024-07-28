@@ -10,3 +10,10 @@ export const newMessage = async (name: string, message: string) => {
     message,
   });
 };
+
+export const removeOldestMessage = async () => {
+  const messages = await Messages.findAll();
+  if(messages.length > 9) {
+    await messages[0].destroy();
+  }
+}
