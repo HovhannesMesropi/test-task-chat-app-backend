@@ -35,8 +35,8 @@ const env = process.env;
 
   app.post(
     "/new-message",
-    body("name").isString().isLength({ min: 3, max: 24 }),
-    body("message").isString().isLength({ min: 1 }),
+    body("name").isString().isLength({ min: 0, max: 24 }),
+    body("message").isString().isLength({ min: 0 }),
     async (req, res) => {
       const result = validationResult(req);
       if (result.isEmpty()) {
